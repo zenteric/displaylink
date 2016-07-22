@@ -27,50 +27,54 @@ __file="${__dir}/$(basename "${BASH_SOURCE[0]}")"
 __base="$(basename ${__file} .sh)"
 __os="Linux"
 # Color palette
-CLEAR="\033[0m"
-CYAN="\033[0;36m"
-LTCYAN="\033[1;36m"
-GREEN="\033[0;32m"
-LTGREEN="\033[1;32m"
-BLUE="\033[0;34m"
-LTBLUE="\033[1;34m"
-PURPLE="\033[0;35m"
-LTPURPLE="\033[1;35m"
-RED="\033[0;31m"
-LTRED="\033[1;31m"
-BROWN="\033[0;33m"
-YELLOW="\033[1;33m"
-
+BLACK=$(tput setaf 0)
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+YELLOW=$(tput setaf 3)
+LIME_YELLOW=$(tput setaf 190)
+POWDER_BLUE=$(tput setaf 153)
+BLUE=$(tput setaf 4)
+MAGENTA=$(tput setaf 5)
+CYAN=$(tput setaf 6)
+WHITE=$(tput setaf 7)
+BRIGHT=$(tput bold)
+CLEAR=$(tput sgr0)
+BLINK=$(tput blink)
+REVERSE=$(tput smso)
+UNDERLINE=$(tput smul)
 # Dependencies
 deps=(unzip linux-headers-$(uname -r) dkms lsb-release)
 
 dep_check() {
-   echo -n "Checking dependencies..."
+   echo -e "Checking dependencies..."
    for dep in ${deps[@]}
    do
       if ! dpkg -s $dep > /dev/null 2>&1
       then
-   echo -e "[${GREEN}${dep} not found ${CLEAR}]"
+   echo -e "[${RED}${dep}${CLEAR} not found]"
 	 read -p "Install? [y/N] " response
 	 response=${response,,} # tolower
 	 if [[ $response =~ ^(yes|y)$ ]]
 	 then
 	    if ! sudo apt-get install $dep
 	    then
-	       echo "$dep installation failed.  Aborting."
+         echo -ne "$dep                             "
+	       echo -e "[${RED}failed.${CLEAR}]  Aborting."
 	       exit 1
 	    fi
 	 else
-	    echo "Cannot continue without $dep.  Aborting."
+	    echo -e "${RED}Cannot continue without $dep.${CLEAR}  Aborting."
 	    exit 1
 	 fi
       else
-	 echo "$dep is installed"
+        printf "%-40s  %-30s\n" "$dep" "[${GREEN}installed${CLEAR}]"
       fi
    done
 }
 
 distro_check(){
+
+echo -e "Checking platform requirements: "
 
 # RedHat
 if [ -f /etc/redhat-release ];
@@ -88,16 +92,6 @@ dep_check
 lsb="$(lsb_release -is)"
 codename="$(lsb_release -cs)"
 platform="$(lsb_release -ics | sed '$!s/$/ /' | tr -d '\n')"
-
-# Unsupported platform message
-message(){
-echo -e "\n------------------------------------------------------\n"
-echo -e "Unsuported platform: $platform"
-echo -e ""
-echo -e "This tool is Open Source and feel free to extend it"
-echo -e "GitHub repo: https://goo.gl/6soXDE"
-echo -e "\n------------------------------------------------------\n"
-}
 
 # Ubuntu
 if [ "$lsb" == "Ubuntu" ];
@@ -120,11 +114,12 @@ then
         exit 1
     fi
 # Debian
-elif [ "$lsb" == "Debian" ];
+elif [ "${lsb}" == "Debian" ];
 then
 	if [ $codename == "jessie" ] || [ $codename == "stretch" ] || [ $codename == "sid" ];
 	then
-		echo -e "\nPlatform requirements satisfied, proceeding ...\n"
+    echo -e "[${GREEN}OK${CLEAR}]"
+		echo -e "\nPlatform ${lsb} requirements satisfied, proceeding ...\n"
 	else
         message
         exit 1
@@ -134,6 +129,16 @@ else
 	exit 1
 fi
 fi
+}
+
+# Unsupported platform message
+message(){
+echo -e "\n======================================================\n"
+echo -e "Unsuported platform: ${platform}"
+echo -e ""
+echo -e "This tool is Open Source and feel free to extend it"
+echo -e "GitHub repo: https://github.com/zenteric/displaylink"
+echo -e "\n======================================================\n"
 }
 
 sysinitdaemon_get(){
@@ -159,12 +164,16 @@ echo $sysinitdaemon
 }
 
 install(){
-echo -e "\nDownloading DisplayLink Ubuntu driver:"
+echo "========================================================================"
+printf "%-10s  %-30s\n" " " "${GREEN}Downloading DisplayLink Ubuntu driver${CLEAR}"
+echo "========================================================================"
 dlurl="http://www.displaylink.com/downloads/file?id=607"
 wget -O DisplayLink_Ubuntu_${VERSION}.zip $dlurl
 # prep
 mkdir $DRIVER_DIR
-echo -e "\nPrepring for install ...\n"
+echo "========================================================================"
+printf "%-10s  %-30s\n" " " "${GREEN}Prepring for install${CLEAR}"
+echo "========================================================================"
 test -d $DRIVER_DIR && /bin/rm -Rf $DRIVER_DIR
 unzip -d $DRIVER_DIR DisplayLink_Ubuntu_${VERSION}.zip
 chmod +x $DRIVER_DIR/displaylink-driver-${VERSION}.run
@@ -183,16 +192,21 @@ sed -i "s/check_requirements/#check_requirements/g" $DRIVER_DIR/displaylink-driv
 sed -i "s/#check_requirements()/check_requirements()/g" $DRIVER_DIR/displaylink-driver-${VERSION}/displaylink-installer.sh
 
 # install
-echo -e "\nInstalling ... \n"
-cd $DRIVER_DIR/displaylink-driver-${VERSION} && sudo ./displaylink-installer.sh install
+echo "========================================================================"
+printf "%-10s  %-30s\n" " " "${GREEN}Installing${CLEAR}"
+echo "========================================================================"
+# cd $DRIVER_DIR/displaylink-driver-${VERSION} && sudo ./displaylink-installer.sh install
 
-echo -e "\nInstall complete, please reboot to apply the changes\n"
+echo "========================================================================"
+printf "%-10s  %-30s\n" " " "${GREEN}Completed Install${CLEAR}"
+echo "========================================================================"
 }
 
 # uninstall
 uninstall(){
-
-echo -e "\nUninstalling ...\n"
+echo "========================================================================"
+printf "%-10s  %-30s\n" " " "${GREEN}Uninstalling${CLEAR}"
+echo "========================================================================"
 
 sudo displaylink-installer uninstall
 sudo rmmod evdi
@@ -202,8 +216,9 @@ sudo rmmod evdi
 #cd -
 #rm -r $DRIVER_DIR
 #rm DisplayLink_Ubuntu_${VERSION}.zip
-
-echo -e "\nUninstall complete\n"
+echo "========================================================================"
+printf "%-10s  %-30s\n" " " "${GREEN}Uninstall Complete${CLEAR}"
+echo "========================================================================"
 }
 
 post(){
@@ -211,7 +226,12 @@ eval $(rm -r $driver_dir)
 eval $(rm DisplayLink_Ubuntu_${VERSION}.zip)
 }
 
-echo -e "\nDisplayLink driver for Debian GNU/Linux\n"
+echo "========================================================================"
+printf "%-10s  %-30s\n" " " "${GREEN}DISPLAYLINK Install Tool${CLEAR}"
+printf "%-10s  %-30s\n" " " "${GREEN}DISPLAYLINK VERSION: ${BLUE}${VERSION}${CLEAR}"
+
+printf "%-10s  %-30s\n" " " "${GREEN}DisplayLink driver for Debian GNU/Linux${CLEAR}"
+echo "========================================================================"
 
 read -p "[$(echo -e ${GREEN} I ${CLEAR}] Install)
 [$(echo -e ${RED} U ${CLEAR}] Uninstall)
