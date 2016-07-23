@@ -195,7 +195,7 @@ sed -i "s/#check_requirements()/check_requirements()/g" $DRIVER_DIR/displaylink-
 echo "========================================================================"
 printf "%-10s  %-30s\n" " " "${GREEN}Installing${CLEAR}"
 echo "========================================================================"
-# cd $DRIVER_DIR/displaylink-driver-${VERSION} && sudo ./displaylink-installer.sh install
+cd $DRIVER_DIR/displaylink-driver-${VERSION} && sudo ./displaylink-installer.sh install
 
 echo "========================================================================"
 printf "%-10s  %-30s\n" " " "${GREEN}Completed Install${CLEAR}"
