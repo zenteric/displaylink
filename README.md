@@ -30,9 +30,3 @@ How? Just run the script! (as regular user)
 
   Regardless of which kernel version you're using.
 
-#### Post installation Guide
-
-Please refer to [Post Installation Guide](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md) for further reference.
-
-#### Discussion
-Blog post: [Kernel agnostic, DisplayLink Debian GNU/Linux driver installer (Jessie/Stretch/Sid)](http://foolcontrol.org/?p=1777)
