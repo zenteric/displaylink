@@ -18,7 +18,7 @@ set -o pipefail
 # set -o xtrace
 
 # Global Variables
-VERSION=1.1.62
+VERSION=1.2.58
 DRIVER_DIR=$VERSION
 
 # Set magic variables for current file, directory, os, etc.
@@ -167,7 +167,7 @@ install(){
 echo "========================================================================"
 printf "%-10s  %-30s\n" " " "${GREEN}Downloading DisplayLink Ubuntu driver${CLEAR}"
 echo "========================================================================"
-dlurl="http://www.displaylink.com/downloads/file?id=607"
+dlurl="http://www.displaylink.com/downloads/file?id=701"
 wget -O DisplayLink_Ubuntu_${VERSION}.zip $dlurl
 # prep
 mkdir $DRIVER_DIR
@@ -195,7 +195,7 @@ sed -i "s/#check_requirements()/check_requirements()/g" $DRIVER_DIR/displaylink-
 echo "========================================================================"
 printf "%-10s  %-30s\n" " " "${GREEN}Installing${CLEAR}"
 echo "========================================================================"
-# cd $DRIVER_DIR/displaylink-driver-${VERSION} && sudo ./displaylink-installer.sh install
+cd $DRIVER_DIR/displaylink-driver-${VERSION} && sudo ./displaylink-installer.sh install
 
 echo "========================================================================"
 printf "%-10s  %-30s\n" " " "${GREEN}Completed Install${CLEAR}"
